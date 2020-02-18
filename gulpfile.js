@@ -1,26 +1,29 @@
 // dependencies
 const gulp = require("gulp");
-const sass = require("gulp-sass");
+const browserSync = require("browser-sync").create();
+var reload = browserSync.reload;
 
+// dev server vars
+const PORT = 3000;
 const BASEDIR = "./public";
 
 // path variables
 const path = {
-  css: `${BASEDIR}/`,
-  sass: `${BASEDIR}/*.scss`
+  html: `${BASEDIR}/*.html`,
+  css: `${BASEDIR}/*.css`,
+  js: `${BASEDIR}/*.js`
 };
 
-// sass task
-gulp.task("sass", function() {
-  return gulp
-    .src(path.sass)
-    .pipe(sass())
-    .pipe(sass().on("error", sass.logError))
-    .pipe(gulp.dest(path.css));
-});
-
-// default ask - call from terminal with `npx gulp`
-// `gulp.series` maps string "sass" to func called `on` method
+// defaultask - call from terminal with `npx gulp`
+// start dev server then order gulp to watch files defined in path obj
 gulp.task("default", function() {
-  gulp.watch(path.sass).on("change", gulp.series("sass"));
+  browserSync.init({
+    server: BASEDIR,
+    port: PORT
+  });
+
+  // `gulp.series` not needed bc browsersync already exposes reload func
+  gulp.watch(path.html).on("change", reload);
+  gulp.watch(path.css).on("change", reload);
+  gulp.watch(path.js).on("change", reload);
 });
